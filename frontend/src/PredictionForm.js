@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './PredictionForm.css';
+
 
 function PredictionForm() {
   // State to manage form inputs and prediction results
@@ -49,6 +51,8 @@ function PredictionForm() {
   // Handle model selection change
   const handleModelChange = (e) => {
     setModelType(e.target.value);
+    setPrediction(null); // Reset prediction when model type changes
+    setError(null); 
   };
 
   // Handle form submission
@@ -151,6 +155,22 @@ function PredictionForm() {
       setError('Error fetching prediction');
       console.log(err);
     }
+  };
+
+  const getStormPrediction = (speed) => {
+    if (speed > 25) return "High risk of a storm. Take precautions!";
+    if (speed > 15) return "Moderate risk of strong winds. Stay alert.";
+    return "No storm predicted. Conditions are normal.";
+  };
+
+  const getHumidityMessage = (speed) => {
+    if (speed > 20) return "Humidity likely to decrease due to high winds.";
+    return "Humidity remains stable.";
+  };
+
+  const getRainfallMessage = (speed) => {
+    if (speed > 20) return "Rainfall may accompany strong winds.";
+    return "No significant rainfall expected.";
   };
 
   // Render model-specific input fields based on selected model
@@ -615,9 +635,18 @@ function PredictionForm() {
       
       {renderModelInputs()}  {/* Render the inputs for selected model */}
       
-      <button type="submit">Submit</button>
-      
-      {prediction && <div>Prediction: {prediction}</div>}
+      <button type="submit" align="center">Submit</button>
+      {prediction !== null && (
+        <div>
+          <h2>Wind Speed Prediction: {prediction} m/s</h2>
+          <div className="insights-container">
+            <h3 className="insights-header">Insights:</h3>
+            <p className="insight-item">Storm Prediction: {getStormPrediction(prediction)}</p>
+            <p className="insight-item">Humidity: {getHumidityMessage(prediction)}</p>
+            <p className="insight-item">Rainfall: {getRainfallMessage(prediction)}</p>
+          </div>
+        </div>
+      )}
       {error && <div style={{ color: 'red' }}>{error}</div>}
     </form>
 
